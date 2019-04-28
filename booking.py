@@ -52,7 +52,7 @@ class Room:
             d[4] += 1000.0
             d.append('полупансион')
             i.append('без питания')
-            main_list += [[i, c, d, ['*']*31]]
+            main_list += [[i, c, d, '*'*31]]
         return main_list
 
     @staticmethod
