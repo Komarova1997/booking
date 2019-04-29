@@ -1,6 +1,7 @@
 from booking import *
 import ru_local
 
+
 def main():
     fund_list = Room.booking_variants(Room)
     client_list = Room.reader('booking.txt')
@@ -9,24 +10,24 @@ def main():
         client_list[client_list.index(i)] = i[:-1]
         a, b, c, d, e, f, g, h = i.split()
         list_1 += [[a, b, c, d, int(e), int(f[:2]), int(g), float(h)]]
+
     count_room = 0
     count_free_room = 0
     income = 0
     lost_income = 0
-    percent = 0
     single = 0
     double = 0
     junior_suite = 0
     lux = 0
     for client in list_1:
-        print('Поступила заявка на бронирование:')
+        print(ru_local.RESERVATION_REQUEST_RECEIVED)
         print()
         print(client_list[list_1.index(client)])
         print()
         variants = []
         places = []
         for room in fund_list:
-            # проверка занятости по дате и по указаной клиентом цене
+            # verification of employment by the date and the price specified by the client
             if '#' not in room[3][client[5]-1:client[5]-1 + client[6]]:
                 if room[0][4] <= client[-1]:
                     variants += [room[0]]
@@ -34,64 +35,130 @@ def main():
                     variants += [room[1]]
                 if room[2][4] <= client[-1]:
                     variants += [room[2]]
-            # подбор вариантов по количеству мест
+            # selection of variants for the number of seats
             for variant in variants:
+                if int(variant[2]) == client[4]:
+                    if variant not in places:
+                        places += [variant]
                 if int(variant[2]) >= client[4]:
                     if variant not in places:
                         places += [variant]
-        # сортировка списка по наибольшей цене
+        # sorting the list at the highest price
         places = sorted(places, key=lambda place: place[4], reverse=True)
-        # TODO: скидка 30%, если вариант не подходит по количеству мест запроса
-        # варианты размещения по максимальной цене
+        # accommodation options at the highest price
         if places != []:
-            print('Найден:')
-            print()
-            # TODO: вывод варианта в виде оформленной строки как впримере \
-            #  (номер 22 одноместный стандарт_улучшенный раcсчитан на 1 чел. фактически 1 чел.  без питания стоимость 3480.00 руб./сутки)
-            print(places[0])
-            category = places[0][1]
-            if category == 'одноместный':
-                single += 1
-            if category == 'двухместный':
-                double += 1
-            if category == 'полулюкс':
-                junior_suite += 1
+            if int(places[0][2]) == client[4]:
+                print(ru_local.FOUND)
+                print()
+                print(ru_local.ROOM + places[0][0] + ' ' +
+                      places[0][1] + ' ' +
+                      places[0][3] + ru_local.FOR +
+                      str(places[0][2]) + ' ' + ru_local.PEOPLE +
+                      ru_local.IN_FACT + str(client[4]) + ' ' + ru_local.PEOPLE +
+                      places[0][-1] + ' ' + ru_local.PRISE +
+                      str(places[0][4]) + ' ' + ru_local.RUB)
+                print()
+                category = places[0][1]
+                if Room.random() != 1:
+                    print(ru_local.CLIENT_AGREE)
+                    count_room += 1
+                    income += round(float(places[0][4]), 2)
+                    for room in fund_list:
+                        if places[0] in room:
+                            room[3] = room[3][:client[5]-1] + '#'*client[6] + room[3][client[5]+client[6]-1:]
+                            if category == ru_local.ONE:
+                                single += 1
+                            if category == ru_local.TWO:
+                                double += 1
+                            if category == ru_local.HALF_LUX:
+                                junior_suite += 1
+                            if category == ru_local.LUX:
+                                lux += 1
+                else:
+                    print(ru_local.CLIENT_REFUSED)
+                    lost_income += round(float(places[0][4]), 2)
             else:
-                lux += 1
-            print()
-            if Room.random() != 1:
-                print('Клиент согласен. Номер забронирован.')
-                count_room += 1
-                income +=  float(h)
-                for room in fund_list:
-                    if places[0] in room:
-                        room[3] = room[3][:client[5]-1] + '#'*client[6] + room[3][client[5]+client[6]-1:]
-            else:
-                print('Клиент отказался от варианта.')
-                lost_income += float(h)
-                count_free_room += 1
-
+                print(ru_local.FOUND)
+                print()
+                print(ru_local.ROOM + places[0][0] + ' ' +
+                      places[0][1] + ' ' +
+                      places[0][3] + ru_local.FOR +
+                      str(places[0][2]) + ' ' + ru_local.PEOPLE +
+                      ru_local.IN_FACT + str(client[4]) + ' ' + ru_local.PEOPLE +
+                      places[0][-1] + ' ' + ru_local.PRISE +
+                      str(places[0][4] * 0.7) + ' ' + ru_local.RUB)
+                print()
+                category = places[0][1]
+                if Room.random() != 1:
+                    print(ru_local.CLIENT_AGREE)
+                    count_room += 1
+                    income += float(list_1[0][-1])
+                    for room in fund_list:
+                        if places[0] in room:
+                            room[3] = room[3][:client[5] - 1] + '#' * client[6] + room[3][client[5] + client[6] - 1:]
+                            if category == ru_local.ONE:
+                                single += 1
+                            if category == ru_local.TWO:
+                                double += 1
+                            if category == ru_local.HALF_LUX:
+                                junior_suite += 1
+                            if category == ru_local.LUX:
+                                lux += 1
+                else:
+                    print(ru_local.CLIENT_REFUSED)
+                    lost_income += round(float(places[0][4]), 2)
+                    count_free_room += 1
         else:
-            print('Предложений по данному запросу нет. В бронировании отказано.')
-            lost_income += float(h)
-            count_free_room += 1
-        percent = (100 * count_room) / 24
+            print(ru_local.NO_OFFERS)
+            lost_income += client[-1]
+        count_free_room = 24 - count_room
+        percent = round(((100 * count_room) / 24), 2)
         print()
-        print('------------------------------------------------------------------------------------------------')
-        print()
-
-
-        '''print('Итог за' )
-        print('Количество занятых номеров: ', count_room)
-        print('Количество свободных номеров: ', count_free_room)
-        print('Занятость по категориям:')
-        print('Одноместных: ', single, ' из 9')
-        print('Двухместных: ', double, ' из 6')
-        print('Полулюкс: ', junior_suite, ' из 4')
-        print('Люкс: ', lux, ' из 5')
-        print('Процент загруженности гостиницы: ', percent, '%')
-        print('Доход за день: ', income, ' руб.')
-        print('Упущенный доход: ', lost_income, ' руб.')'''
+        try:
+            if client[0] == list_1[list_1.index(client) + 1][0]:
+                print('------------------------------------------------------------------------------------------------')
+                print()
+        except IndexError:
+            print('------------------------------------------------------------------------------------------------')
+            print()
+        try:
+            if client[0] != list_1[list_1.index(client) + 1][0]:
+                print('================================================================================================')
+                print()
+                print(ru_local.TOTAL + client[0])
+                print(ru_local.NUMBER_OF_OCCUPIED_ROOMS, count_room)
+                print(ru_local.NUMBER_OF_FREE_ROOMS, count_free_room)
+                print(ru_local.EMPLOYMENT_BY_CATEGORY)
+                print(ru_local.FOR_ONE, single, ru_local.FROM_9)
+                print(ru_local.FOR_TWO, double, ru_local.FROM_6)
+                print(ru_local.HALF_LUXX, junior_suite, ru_local.FROM_4)
+                print(ru_local.LUXX, lux, ru_local.FROM_5)
+                print(ru_local.PERCENT_OF_HOTEL_LOADING, percent, '%')
+                print(ru_local.DAY_INCOME, income, ru_local.RUBL)
+                print(ru_local.DAY_LOST_INCOME, lost_income, ru_local.RUBL)
+                count_room = 0
+                count_free_room = 0
+                income = 0
+                lost_income = 0
+                single = 0
+                double = 0
+                junior_suite = 0
+                lux = 0
+        except IndexError:
+            print('================================================================================================')
+            print()
+            print(ru_local.TOTAL + client[0])
+            print(ru_local.NUMBER_OF_OCCUPIED_ROOMS, count_room)
+            print(ru_local.NUMBER_OF_FREE_ROOMS, count_free_room)
+            print(ru_local.EMPLOYMENT_BY_CATEGORY)
+            print(ru_local.FOR_ONE, single, ru_local.FROM_9)
+            print(ru_local.FOR_TWO, double, ru_local.FROM_6)
+            print(ru_local.HALF_LUXX, junior_suite, ru_local.FROM_4)
+            print(ru_local.LUXX, lux, ru_local.FROM_5)
+            print(ru_local.PERCENT_OF_HOTEL_LOADING, percent, '%')
+            print(ru_local.DAY_INCOME, income, ru_local.RUBL)
+            print(ru_local.DAY_LOST_INCOME, lost_income, ru_local.RUBL)
+            print()
 
 if __name__ == '__main__':
     main()
