@@ -16,7 +16,6 @@ def main():
         print(client_list[list_1.index(client)])
         print()
         variants = []
-        price = []
         places = []
         for room in fund_list:
             # проверка занятости по дате и по указаной клиентом цене
@@ -29,32 +28,58 @@ def main():
                     variants += [room[2]]
             # подбор вариантов по количеству мест
             for variant in variants:
+                if int(variant[2]) == client[4]:
+                    if variant not in places:
+                        places += [variant]
                 if int(variant[2]) >= client[4]:
                     if variant not in places:
                         places += [variant]
         # сортировка списка по наибольшей цене
         places = sorted(places, key=lambda place: place[4], reverse=True)
-        # TODO: скидка 30%, если вариант не подходит по количеству мест запроса
         # варианты размещения по максимальной цене
         if places != []:
-            print('Найден:')
-            print()
-            # TODO: вывод варианта в виде оформленной строки как впримере \
-            #  (номер 22 одноместный стандарт_улучшенный раcсчитан на 1 чел. фактически 1 чел.  без питания стоимость 3480.00 руб./сутки)
-            print(places[0])
-            print()
-            if Room.random() != 1:
-                print('Клиент согласен. Номер забронирован.')
-                for room in fund_list:
-                    if places[0] in room:
-                        room[3] = room[3][:client[5]-1] + '#'*client[6] + room[3][client[5]+client[6]-1:]
+            if int(places[0][2]) == client[4]:
+                print('Найден:')
+                print()
+                print('номер ' + places[0][0] + ' ' +
+                      places[0][1] + ' ' +
+                      places[0][3] + ' расчитан на ' +
+                      str(places[0][2]) + ' ' + 'чел. ' +
+                      'фактически ' + str(client[4]) + ' ' + 'чел. ' +
+                      places[0][-1] + ' ' + 'стоимость ' +
+                      str(places[0][4]) + ' ' + 'руб./сутки')
+                print()
+                if Room.random() != 1:
+                    print('Клиент согласен. Номер забронирован.')
+                    for room in fund_list:
+                        if places[0] in room:
+                            room[3] = room[3][:client[5]-1] + '#'*client[6] + room[3][client[5]+client[6]-1:]
+                else:
+                    print('Клиент отказался от варианта.')
             else:
-                print('Клиент отказался от варианта.')
+                print('Найден:')
+                print()
+                print('номер ' + places[0][0] + ' ' +
+                      places[0][1] + ' ' +
+                      places[0][3] + ' расчитан на ' +
+                      str(places[0][2]) + ' ' + 'чел. ' +
+                      'фактически ' + str(client[4]) + ' ' + 'чел. ' +
+                      places[0][-1] + ' ' + 'стоимость ' +
+                      str(places[0][4] * 0.7) + ' ' + 'руб./сутки')
+                print()
+                if Room.random() != 1:
+                    print('Клиент согласен. Номер забронирован.')
+                    for room in fund_list:
+                        if places[0] in room:
+                            room[3] = room[3][:client[5] - 1] + '#' * client[6] + room[3][client[5] + client[6] - 1:]
+                else:
+                    print('Клиент отказался от варианта.')
         else:
             print('Предложений по данному запросу нет. В бронировании отказано.')
         print()
         print('------------------------------------------------------------------------------------------------')
         print()
+# TODO: отчет по каждому дню
 
 
 if __name__ == '__main__':
