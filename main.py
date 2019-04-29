@@ -69,14 +69,13 @@ def main():
                 if Room.random() != 1:
                     print('Клиент согласен. Номер забронирован.')
                     count_room += 1
-                    income += float(list_1[0][-1])
+                    income += float(places[0][4])
                     for room in fund_list:
                         if places[0] in room:
                             room[3] = room[3][:client[5]-1] + '#'*client[6] + room[3][client[5]+client[6]-1:]
                 else:
                     print('Клиент отказался от варианта.')
                     lost_income += client[-1]
-                    count_free_room += 1
             else:
                 print('Найден:')
                 print()
@@ -109,7 +108,7 @@ def main():
         else:
             print('Предложений по данному запросу нет. В бронировании отказано.')
             lost_income += client[-1]
-            count_free_room += 1
+        count_free_room = 24 - count_room
         percent = (100 * count_room) / 24
         print()
         print('------------------------------------------------------------------------------------------------')
@@ -137,6 +136,7 @@ def main():
                 junior_suite = 0
                 lux = 0
         except IndexError:
+            print('================================================================================================')
             print()
             print('Итог за ' + client[0])
             print('Количество занятых номеров: ', count_room)
@@ -149,6 +149,7 @@ def main():
             print('Процент загруженности гостиницы: ', percent, '%')
             print('Доход за день: ', income, ' руб.')
             print('Упущенный доход: ', lost_income, ' руб.')
+            print()
 # TODO: отчет по каждому дню доредактирвоать
 
 
