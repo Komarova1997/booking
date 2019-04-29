@@ -10,6 +10,14 @@ def main():
         a, b, c, d, e, f, g, h = i.split()
         list_1 += [[a, b, c, d, int(e), int(f[:2]), int(g), float(h)]]
 
+    count_room = 0
+    count_free_room = 0
+    income = 0
+    lost_income = 0
+    single = 0
+    double = 0
+    junior_suite = 0
+    lux = 0
     for client in list_1:
         print('Поступила заявка на бронирование:')
         print()
@@ -49,13 +57,26 @@ def main():
                       places[0][-1] + ' ' + 'стоимость ' +
                       str(places[0][4]) + ' ' + 'руб./сутки')
                 print()
+                category = places[0][1]
+                if category == 'одноместный':
+                    single += 1
+                if category == 'двухместный':
+                    double += 1
+                if category == 'полулюкс':
+                    junior_suite += 1
+                else:
+                    lux += 1
                 if Room.random() != 1:
                     print('Клиент согласен. Номер забронирован.')
+                    count_room += 1
+                    income += float(list_1[0][-1])
                     for room in fund_list:
                         if places[0] in room:
                             room[3] = room[3][:client[5]-1] + '#'*client[6] + room[3][client[5]+client[6]-1:]
                 else:
                     print('Клиент отказался от варианта.')
+                    lost_income += client[-1]
+                    count_free_room += 1
             else:
                 print('Найден:')
                 print()
@@ -67,19 +88,68 @@ def main():
                       places[0][-1] + ' ' + 'стоимость ' +
                       str(places[0][4] * 0.7) + ' ' + 'руб./сутки')
                 print()
+                category = places[0][1]
+                if category == 'одноместный':
+                    single += 1
+                if category == 'двухместный':
+                    double += 1
+                if category == 'полулюкс':
+                    junior_suite += 1
                 if Room.random() != 1:
                     print('Клиент согласен. Номер забронирован.')
+                    count_room += 1
+                    income += float(list_1[0][-1])
                     for room in fund_list:
                         if places[0] in room:
                             room[3] = room[3][:client[5] - 1] + '#' * client[6] + room[3][client[5] + client[6] - 1:]
                 else:
                     print('Клиент отказался от варианта.')
+                    lost_income += client[-1]
+                    count_free_room += 1
         else:
             print('Предложений по данному запросу нет. В бронировании отказано.')
+            lost_income += client[-1]
+            count_free_room += 1
+        percent = (100 * count_room) / 24
         print()
         print('------------------------------------------------------------------------------------------------')
         print()
-# TODO: отчет по каждому дню
+        try:
+            if client[0] != list_1[list_1.index(client) + 1][0]:
+                print()
+                print('Итог за ' + client[0])
+                print('Количество занятых номеров: ', count_room)
+                print('Количество свободных номеров: ', count_free_room)
+                print('Занятость по категориям:')
+                print('Одноместных: ', single, ' из 9')
+                print('Двухместных: ', double, ' из 6')
+                print('Полулюкс: ', junior_suite, ' из 4')
+                print('Люкс: ', lux, ' из 5')
+                print('Процент загруженности гостиницы: ', percent, '%')
+                print('Доход за день: ', income, ' руб.')
+                print('Упущенный доход: ', lost_income, ' руб.')
+                count_room = 0
+                count_free_room = 0
+                income = 0
+                lost_income = 0
+                single = 0
+                double = 0
+                junior_suite = 0
+                lux = 0
+        except IndexError:
+            print()
+            print('Итог за ' + client[0])
+            print('Количество занятых номеров: ', count_room)
+            print('Количество свободных номеров: ', count_free_room)
+            print('Занятость по категориям:')
+            print('Одноместных: ', single, ' из 9')
+            print('Двухместных: ', double, ' из 6')
+            print('Полулюкс: ', junior_suite, ' из 4')
+            print('Люкс: ', lux, ' из 5')
+            print('Процент загруженности гостиницы: ', percent, '%')
+            print('Доход за день: ', income, ' руб.')
+            print('Упущенный доход: ', lost_income, ' руб.')
+# TODO: отчет по каждому дню доредактирвоать
 
 
 if __name__ == '__main__':
